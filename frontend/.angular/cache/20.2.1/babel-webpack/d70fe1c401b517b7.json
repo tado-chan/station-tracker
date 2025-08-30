@@ -1,0 +1,1 @@
+{"ast":null,"code":"import { registerPlugin } from '@capacitor/core';\nconst BackgroundGeofence = registerPlugin('BackgroundGeofence', {\n  web: () => import('./background-geofence.web').then(m => new m.BackgroundGeofenceWeb())\n});\nexport default BackgroundGeofence;","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

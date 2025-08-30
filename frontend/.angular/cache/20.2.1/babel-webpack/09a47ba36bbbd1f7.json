@@ -1,0 +1,1 @@
+{"ast":null,"code":"/*!\n * (C) Ionic http://ionicframework.com - MIT License\n */\nimport { A as Alert, d as defineCustomElement$1 } from './alert.js';\nconst IonAlert = Alert;\nconst defineCustomElement = defineCustomElement$1;\nexport { IonAlert, defineCustomElement };","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

@@ -1,0 +1,1 @@
+{"ast":null,"code":"/*!\n * (C) Ionic http://ionicframework.com - MIT License\n */\nimport { M as Modal, d as defineCustomElement$1 } from './modal.js';\nconst IonModal = Modal;\nconst defineCustomElement = defineCustomElement$1;\nexport { IonModal, defineCustomElement };","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

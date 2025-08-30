@@ -1,0 +1,1 @@
+{"ast":null,"code":"/*!\n * (C) Ionic http://ionicframework.com - MIT License\n */\nimport { S as SelectModal, d as defineCustomElement$1 } from './select-modal.js';\nconst IonSelectModal = SelectModal;\nconst defineCustomElement = defineCustomElement$1;\nexport { IonSelectModal, defineCustomElement };","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

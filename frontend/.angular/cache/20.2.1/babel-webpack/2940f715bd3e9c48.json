@@ -1,0 +1,1 @@
+{"ast":null,"code":"/*!\n * (C) Ionic http://ionicframework.com - MIT License\n */\nimport { T as ToolbarTitle, d as defineCustomElement$1 } from './title.js';\nconst IonTitle = ToolbarTitle;\nconst defineCustomElement = defineCustomElement$1;\nexport { IonTitle, defineCustomElement };","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

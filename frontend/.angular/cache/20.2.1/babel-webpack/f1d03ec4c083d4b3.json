@@ -1,0 +1,1 @@
+{"ast":null,"code":"/*!\n * (C) Ionic http://ionicframework.com - MIT License\n */\nimport { R as RadioGroup, d as defineCustomElement$1 } from './radio-group.js';\nconst IonRadioGroup = RadioGroup;\nconst defineCustomElement = defineCustomElement$1;\nexport { IonRadioGroup, defineCustomElement };","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

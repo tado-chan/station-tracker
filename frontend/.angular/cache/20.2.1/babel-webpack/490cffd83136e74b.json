@@ -1,0 +1,1 @@
+{"ast":null,"code":"/*!\n * (C) Ionic http://ionicframework.com - MIT License\n */\nimport { P as Popover, d as defineCustomElement$1 } from './popover.js';\nconst IonPopover = Popover;\nconst defineCustomElement = defineCustomElement$1;\nexport { IonPopover, defineCustomElement };","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

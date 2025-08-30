@@ -1,0 +1,1 @@
+{"ast":null,"code":"/*!\n * (C) Ionic http://ionicframework.com - MIT License\n */\nimport { C as Checkbox, d as defineCustomElement$1 } from './checkbox.js';\nconst IonCheckbox = Checkbox;\nconst defineCustomElement = defineCustomElement$1;\nexport { IonCheckbox, defineCustomElement };","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}
