@@ -59,7 +59,7 @@ export class HistoryPage implements OnInit {
 
   private async loadStats() {
     try {
-      this.stats = await this.stationService.getVisitStats().toPromise();
+      this.stats = await this.stationService.getVisitStats().toPromise() || null;
     } catch (error) {
       console.error('Failed to load stats:', error);
     }

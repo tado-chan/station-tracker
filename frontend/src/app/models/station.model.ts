@@ -2,6 +2,7 @@ export interface Station {
   id: number;
   name: string;
   name_kana: string;
+  line?: string;
   latitude: number;
   longitude: number;
   polygon_data: string;
@@ -11,6 +12,7 @@ export interface Station {
 export interface StationVisit {
   id?: number;
   station: number;
+  station_name?: string;
   station_data?: Station;
   arrived_at: string;
   departed_at?: string;

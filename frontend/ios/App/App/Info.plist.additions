@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Add these entries to your main Info.plist -->
+    
+    <!-- Background Modes -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+        <string>background-fetch</string>
+        <string>background-app-refresh</string>
+    </array>
+    
+    <!-- Background Task Identifiers -->
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.stationtracker.app.background-location</string>
+    </array>
+    
+    <!-- Location Usage Descriptions -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>このアプリは駅への到着・出発を記録するために位置情報を使用します。</string>
+    
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>バックグラウンドで駅への到着・出発を自動記録するために、常に位置情報へのアクセスを許可してください。</string>
+    
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>バックグラウンドで駅への到着・出発を自動記録するために位置情報を使用します。</string>
+    
+    <!-- Local Notifications -->
+    <key>NSUserNotificationAlertStyle</key>
+    <string>alert</string>
+</dict>
+</plist>
