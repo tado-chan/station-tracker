@@ -1,0 +1,135 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      駅トラッカー
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="testNotification()">
+        <ion-icon name="notifications"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">駅トラッカー</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Tracking Status Card -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>位置追跡</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="tracking-status">
+        <ion-chip [color]="isTracking ? 'success' : 'medium'">
+          <ion-icon [name]="isTracking ? 'location' : 'location-outline'"></ion-icon>
+          <ion-label>{{ isTracking ? '追跡中' : '停止中' }}</ion-label>
+        </ion-chip>
+        
+        <ion-button 
+          (click)="toggleTracking()" 
+          [color]="isTracking ? 'danger' : 'primary'"
+          size="default">
+          <ion-icon [name]="isTracking ? 'stop' : 'play'" slot="start"></ion-icon>
+          {{ isTracking ? '停止' : '開始' }}
+        </ion-button>
+      </div>
+
+      <div *ngIf="currentLocation" class="location-info">
+        <p>現在位置: {{ currentLocation.latitude.toFixed(6) }}, {{ currentLocation.longitude.toFixed(6) }}</p>
+        <ion-button fill="clear" (click)="getCurrentPosition()">
+          <ion-icon name="refresh" slot="start"></ion-icon>
+          位置を更新
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Today's Summary -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>本日の記録</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <ion-text color="primary">
+            <h2>{{ todayVisits.length }}</h2>
+          </ion-text>
+          <ion-text color="medium">
+            <p>訪問回数</p>
+          </ion-text>
+        </div>
+        <div class="stat-item">
+          <ion-text color="success">
+            <h2>{{ (todayVisits | unique:'station').length }}</h2>
+          </ion-text>
+          <ion-text color="medium">
+            <p>駅数</p>
+          </ion-text>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Recent Events -->
+  <ion-card *ngIf="recentEvents.length > 0">
+    <ion-card-header>
+      <ion-card-title>最近のイベント</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let event of recentEvents" lines="none">
+          <ion-icon 
+            [name]="getEventIcon(event.type)" 
+            [color]="getEventColor(event.type)" 
+            slot="start">
+          </ion-icon>
+          <ion-label>
+            <h3>{{ event.station.name }}駅</h3>
+            <p>{{ event.type === 'enter' ? '到着' : '出発' }} - {{ formatEventTime(event.timestamp) }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Nearby Stations -->
+  <ion-card *ngIf="nearbyStations.length > 0">
+    <ion-card-header>
+      <ion-card-title>近くの駅</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let station of nearbyStations" lines="none">
+          <ion-icon name="train" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h3>{{ station.name }}駅</h3>
+            <p>{{ station.name_kana }}</p>
+            <p *ngIf="calculateDistance(station)" color="medium">
+              距離: {{ calculateDistance(station) }}m
+            </p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Empty State -->
+  <ion-card *ngIf="!isTracking && recentEvents.length === 0">
+    <ion-card-content class="empty-state">
+      <ion-icon name="location-outline" size="large" color="medium"></ion-icon>
+      <h2>位置追跡を開始してください</h2>
+      <p>駅への到着・出発を自動で記録します</p>
+      <ion-button (click)="toggleTracking()" color="primary">
+        <ion-icon name="play" slot="start"></ion-icon>
+        追跡開始
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

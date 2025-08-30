@@ -1,0 +1,201 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>訪問履歴</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Stats Summary -->
+  <ion-card *ngIf="stats">
+    <ion-card-header>
+      <ion-card-title>統計情報</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <ion-text color="primary">
+            <h2>{{ stats.total_visits }}</h2>
+          </ion-text>
+          <ion-text color="medium">
+            <p>総訪問回数</p>
+          </ion-text>
+        </div>
+        <div class="stat-item">
+          <ion-text color="success">
+            <h2>{{ stats.unique_stations }}</h2>
+          </ion-text>
+          <ion-text color="medium">
+            <p>訪問駅数</p>
+          </ion-text>
+        </div>
+        <div class="stat-item">
+          <ion-text color="tertiary">
+            <h2>{{ Math.round(stats.avg_duration) }}</h2>
+          </ion-text>
+          <ion-text color="medium">
+            <p>平均滞在時間(分)</p>
+          </ion-text>
+        </div>
+        <div class="stat-item" *ngIf="stats.most_visited">
+          <ion-text color="warning">
+            <h3>{{ stats.most_visited.station__name }}</h3>
+          </ion-text>
+          <ion-text color="medium">
+            <p>最多訪問駅 ({{ stats.most_visited.visit_count }}回)</p>
+          </ion-text>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Filters -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>フィルター</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <!-- Period Filter -->
+      <ion-item>
+        <ion-label>期間</ion-label>
+        <ion-select 
+          [(ngModel)]="selectedPeriod" 
+          (selectionChange)="onPeriodChange()"
+          interface="popover">
+          <ion-select-option 
+            *ngFor="let period of periods" 
+            [value]="period.value">
+            {{ period.label }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Search -->
+      <ion-item>
+        <ion-label position="floating">検索 (駅名、メモ)</ion-label>
+        <ion-input 
+          [(ngModel)]="searchQuery"
+          (ionInput)="onSearchInput($event)"
+          clearInput="true">
+        </ion-input>
+      </ion-item>
+
+      <!-- Station Filter -->
+      <ion-item *ngIf="getUniqueStations().length > 0">
+        <ion-label>駅で絞り込み</ion-label>
+        <ion-select 
+          [(ngModel)]="selectedStation" 
+          (selectionChange)="filterVisits()"
+          interface="popover">
+          <ion-select-option value="">すべての駅</ion-select-option>
+          <ion-select-option 
+            *ngFor="let station of getUniqueStations()" 
+            [value]="station">
+            {{ station }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Results Summary -->
+  <ion-item *ngIf="filteredVisits.length > 0">
+    <ion-label>
+      <p>{{ filteredVisits.length }}件の記録が見つかりました</p>
+    </ion-label>
+  </ion-item>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <ion-spinner name="dots"></ion-spinner>
+    <p>読み込み中...</p>
+  </div>
+
+  <!-- Visit List -->
+  <ion-list *ngIf="!loading && getPaginatedVisits().length > 0">
+    <ion-card *ngFor="let visit of getPaginatedVisits()">
+      <ion-card-content>
+        <div class="visit-header">
+          <div class="visit-info">
+            <ion-icon 
+              [name]="getVisitIcon(visit)" 
+              [color]="getVisitColor(visit)"
+              size="large">
+            </ion-icon>
+            <div class="visit-details">
+              <h3>{{ visit.station_data?.name || '不明な駅' }}駅</h3>
+              <p class="visit-time">{{ formatDateTime(visit.arrived_at) }}</p>
+              <p *ngIf="visit.duration_minutes" class="duration">
+                滞在時間: {{ formatDuration(visit.duration_minutes) }}
+              </p>
+            </div>
+          </div>
+          <ion-button 
+            fill="clear" 
+            color="danger" 
+            (click)="deleteVisit(visit)">
+            <ion-icon name="trash" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+
+        <div *ngIf="visit.weather" class="visit-meta">
+          <ion-chip color="medium">
+            <ion-icon name="partly-sunny"></ion-icon>
+            <ion-label>{{ visit.weather }}</ion-label>
+          </ion-chip>
+        </div>
+
+        <div *ngIf="visit.notes" class="visit-notes">
+          <ion-text color="medium">
+            <p>{{ visit.notes }}</p>
+          </ion-text>
+        </div>
+
+        <div class="visit-location">
+          <ion-text color="medium">
+            <small>
+              位置: {{ visit.latitude.toFixed(6) }}, {{ visit.longitude.toFixed(6) }}
+            </small>
+          </ion-text>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </ion-list>
+
+  <!-- Pagination -->
+  <div *ngIf="filteredVisits.length > pageSize" class="pagination">
+    <ion-button 
+      [disabled]="!hasPreviousPage()" 
+      (click)="previousPage()"
+      fill="outline">
+      <ion-icon name="chevron-back" slot="start"></ion-icon>
+      前へ
+    </ion-button>
+    
+    <ion-text color="medium">
+      <span>{{ currentPage + 1 }} / {{ Math.ceil(filteredVisits.length / pageSize) }}</span>
+    </ion-text>
+    
+    <ion-button 
+      [disabled]="!hasNextPage()" 
+      (click)="nextPage()"
+      fill="outline">
+      次へ
+      <ion-icon name="chevron-forward" slot="end"></ion-icon>
+    </ion-button>
+  </div>
+
+  <!-- Empty State -->
+  <ion-card *ngIf="!loading && filteredVisits.length === 0">
+    <ion-card-content class="empty-state">
+      <ion-icon name="document-outline" size="large" color="medium"></ion-icon>
+      <h2>記録がありません</h2>
+      <p *ngIf="visits.length === 0">まだ駅を訪問していません</p>
+      <p *ngIf="visits.length > 0">フィルター条件に一致する記録がありません</p>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

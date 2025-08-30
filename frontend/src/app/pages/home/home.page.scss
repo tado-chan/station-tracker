@@ -1,0 +1,97 @@
+.tracking-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.location-info {
+  margin-top: 16px;
+  padding: 12px;
+  background: var(--ion-color-light);
+  border-radius: 8px;
+  
+  p {
+    margin: 0 0 8px 0;
+    font-family: monospace;
+    font-size: 0.9em;
+    color: var(--ion-color-medium);
+  }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  text-align: center;
+}
+
+.stat-item {
+  h2 {
+    margin: 0;
+    font-size: 2em;
+    font-weight: bold;
+  }
+  
+  p {
+    margin: 4px 0 0 0;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  
+  ion-icon {
+    margin-bottom: 16px;
+  }
+  
+  h2 {
+    color: var(--ion-color-dark);
+    margin: 0 0 8px 0;
+  }
+  
+  p {
+    color: var(--ion-color-medium);
+    margin: 0 0 24px 0;
+  }
+}
+
+ion-chip {
+  --background: var(--ion-color-light);
+}
+
+ion-list {
+  padding: 0;
+}
+
+ion-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  
+  ion-label {
+    margin: 12px 0;
+    
+    h3 {
+      margin: 0 0 4px 0;
+      font-weight: 600;
+    }
+    
+    p {
+      margin: 2px 0;
+      font-size: 0.9em;
+    }
+  }
+}
+
+/* Animation for tracking status */
+.tracking-status ion-chip {
+  transition: all 0.3s ease;
+}
+
+.tracking-status ion-button {
+  transition: all 0.3s ease;
+}
