@@ -28,7 +28,8 @@ const config: CapacitorConfig = {
       enabled: true,
       title: "駅記録アプリ",
       text: "バックグラウンドで位置を追跡中...",
-      silent: false
+      silent: false,
+      resume: true
     }
   }
 };

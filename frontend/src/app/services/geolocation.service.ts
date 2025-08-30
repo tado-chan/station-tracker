@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Geolocation } from '@capacitor/geolocation';
+import { BackgroundMode } from '@anuradev/capacitor-background-mode';
 import { BehaviorSubject } from 'rxjs';
 import { Station, StationVisit } from '../models/station.model';
 import { StationService } from './station.service';
@@ -42,6 +43,14 @@ export class GeolocationService {
         throw new Error('Location permission not granted');
       }
 
+      // Enable background mode for continuous tracking
+      try {
+        await BackgroundMode.enable({} as any);
+      } catch (error) {
+        console.warn('Background mode enable failed:', error);
+      }
+      console.log('Background mode enabled');
+
       this.isTracking = true;
       
       // Start watching position
@@ -69,6 +78,9 @@ export class GeolocationService {
         }
       );
 
+      // Background mode configuration is handled in capacitor.config.ts
+      // No additional settings method available
+
     } catch (error) {
       console.error('Failed to start tracking:', error);
       this.isTracking = false;
@@ -81,6 +93,15 @@ export class GeolocationService {
       await Geolocation.clearWatch({ id: this.watchId });
       this.watchId = null;
     }
+    
+    // Disable background mode
+    try {
+      await BackgroundMode.disable();
+    } catch (error) {
+      console.warn('Background mode disable failed:', error);
+    }
+    console.log('Background mode disabled');
+    
     this.isTracking = false;
     this.currentLocation.next(null);
   }
