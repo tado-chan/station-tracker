@@ -1,118 +1,169 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      駅トラッカー
-    </ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="testNotification()">
-        <ion-icon name="notifications"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+    <ion-title>駅記録アプリ - バックグラウンド対応</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">駅トラッカー</ion-title>
+      <ion-title size="large">駅記録アプリ</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <!-- Tracking Status Card -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>位置追跡</ion-card-title>
-    </ion-card-header>
+  <!-- Loading Indicator -->
+  <ion-card *ngIf="isInitializing">
     <ion-card-content>
-      <div class="tracking-status">
-        <ion-chip [color]="isTracking ? 'success' : 'medium'">
-          <ion-icon [name]="isTracking ? 'location' : 'location-outline'"></ion-icon>
-          <ion-label>{{ isTracking ? '追跡中' : '停止中' }}</ion-label>
-        </ion-chip>
-        
-        <ion-button 
-          (click)="toggleTracking()" 
-          [color]="isTracking ? 'danger' : 'primary'"
-          size="default">
-          <ion-icon [name]="isTracking ? 'stop' : 'play'" slot="start"></ion-icon>
-          {{ isTracking ? '停止' : '開始' }}
-        </ion-button>
-      </div>
-
-      <div *ngIf="currentLocation" class="location-info">
-        <p>現在位置: {{ currentLocation.latitude.toFixed(6) }}, {{ currentLocation.longitude.toFixed(6) }}</p>
-        <ion-button fill="clear" (click)="getCurrentPosition()">
-          <ion-icon name="refresh" slot="start"></ion-icon>
-          位置を更新
-        </ion-button>
-      </div>
+      <ion-progress-bar type="indeterminate"></ion-progress-bar>
+      <p>システムを初期化中...</p>
     </ion-card-content>
   </ion-card>
 
-  <!-- Today's Summary -->
+  <!-- Integrated Tracking Status -->
   <ion-card>
     <ion-card-header>
-      <ion-card-title>本日の記録</ion-card-title>
+      <ion-card-title>
+        統合位置追跡システム
+        <ion-badge [color]="getTrackingStatusColor()" style="margin-left: 10px;">
+          {{ trackingStatus.isActive ? 'アクティブ' : '停止中' }}
+        </ion-badge>
+      </ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <div class="stats-grid">
-        <div class="stat-item">
-          <ion-text color="primary">
-            <h2>{{ todayVisits.length }}</h2>
-          </ion-text>
-          <ion-text color="medium">
-            <p>訪問回数</p>
-          </ion-text>
-        </div>
-        <div class="stat-item">
-          <ion-text color="success">
-            <h2>{{ (todayVisits | unique:'station').length }}</h2>
-          </ion-text>
-          <ion-text color="medium">
-            <p>駅数</p>
-          </ion-text>
-        </div>
-      </div>
-    </ion-card-content>
-  </ion-card>
-
-  <!-- Recent Events -->
-  <ion-card *ngIf="recentEvents.length > 0">
-    <ion-card-header>
-      <ion-card-title>最近のイベント</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>
-        <ion-item *ngFor="let event of recentEvents" lines="none">
-          <ion-icon 
-            [name]="getEventIcon(event.type)" 
-            [color]="getEventColor(event.type)" 
-            slot="start">
-          </ion-icon>
-          <ion-label>
-            <h3>{{ event.station.name }}駅</h3>
-            <p>{{ event.type === 'enter' ? '到着' : '出発' }} - {{ formatEventTime(event.timestamp) }}</p>
-          </ion-label>
+      <ion-button 
+        expand="block" 
+        [color]="trackingStatus.isActive ? 'danger' : 'primary'"
+        (click)="toggleTracking()"
+        [disabled]="isInitializing">
+        {{ trackingStatus.isActive ? 'バックグラウンド追跡停止' : 'バックグラウンド追跡開始' }}
+      </ion-button>
+      
+      <!-- Tracking Status Details -->
+      <div class="tracking-details" *ngIf="trackingStatus.isActive">
+        <ion-item lines="none">
+          <ion-label>ネイティブジオフェンス</ion-label>
+          <ion-badge [color]="trackingStatus.nativeGeofencing ? 'success' : 'medium'">
+            {{ trackingStatus.nativeGeofencing ? 'ON' : 'OFF' }}
+          </ion-badge>
         </ion-item>
-      </ion-list>
+        <ion-item lines="none">
+          <ion-label>バックグラウンドモード</ion-label>
+          <ion-badge [color]="trackingStatus.backgroundMode ? 'success' : 'medium'">
+            {{ trackingStatus.backgroundMode ? 'ON' : 'OFF' }}
+          </ion-badge>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-label>クラウド同期</ion-label>
+          <ion-badge [color]="getSyncStatusColor()">
+            {{ syncStatus.isOnline ? 'オンライン' : 'オフライン' }}
+          </ion-badge>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-label>アクティブ領域</ion-label>
+          <ion-badge color="primary">{{ trackingStatus.activeRegions }}/{{ geofenceStats.maxRegions }}</ion-badge>
+        </ion-item>
+      </div>
+      
+      <div class="status-info" *ngIf="currentLocation">
+        <p>現在位置: {{ currentLocation.latitude | number:'1.6-6' }}, {{ currentLocation.longitude | number:'1.6-6' }}</p>
+        <p *ngIf="trackingStatus.lastLocationUpdate">
+          最終更新: {{ trackingStatus.lastLocationUpdate | date:'HH:mm:ss' }}
+        </p>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- System Statistics -->
+  <ion-card *ngIf="trackingStatus.isActive">
+    <ion-card-header>
+      <ion-card-title>システム統計</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item lines="none">
+        <ion-label>
+          <h3>ジオフェンス領域</h3>
+          <p>{{ geofenceStats.activeRegions }} / {{ geofenceStats.maxRegions }} 使用中</p>
+        </ion-label>
+        <ion-badge [color]="getBatteryOptimizationColor()">
+          {{ trackingStatus.batteryOptimized ? '最適化済み' : '要最適化' }}
+        </ion-badge>
+      </ion-item>
+      
+      <ion-item lines="none">
+        <ion-label>
+          <h3>周辺駅</h3>
+          <p>{{ geofenceStats.nearbyStations }} / {{ geofenceStats.totalStations }} 駅</p>
+        </ion-label>
+      </ion-item>
+      
+      <ion-item lines="none">
+        <ion-label>
+          <h3>同期状況</h3>
+          <p>未送信: {{ syncStatus.pendingEvents }}件</p>
+          <p>エラー: {{ syncStatus.syncErrors }}件</p>
+        </ion-label>
+        <ion-badge [color]="getSyncStatusColor()">
+          {{ syncStatus.totalEventsSynced }}件同期済み
+        </ion-badge>
+      </ion-item>
+      
+      <ion-item lines="none" *ngIf="geofenceStats.lastOptimization">
+        <ion-label>
+          <h3>最終最適化</h3>
+          <p>{{ geofenceStats.lastOptimization | date:'MM/dd HH:mm' }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Manual Controls -->
+  <ion-card *ngIf="trackingStatus.isActive">
+    <ion-card-header>
+      <ion-card-title>手動操作</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-button expand="block" fill="outline" (click)="forceOptimization()">
+        ジオフェンス最適化実行
+      </ion-button>
+      <ion-button expand="block" fill="outline" (click)="forcSync()" [disabled]="!syncStatus.isOnline">
+        クラウド同期実行
+      </ion-button>
+      <ion-button expand="block" fill="outline" (click)="getSystemStatus()">
+        システム状況表示（コンソール）
+      </ion-button>
     </ion-card-content>
   </ion-card>
 
   <!-- Nearby Stations -->
   <ion-card *ngIf="nearbyStations.length > 0">
     <ion-card-header>
-      <ion-card-title>近くの駅</ion-card-title>
+      <ion-card-title>周辺の駅 ({{ nearbyStations.length }}件)</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <ion-list>
-        <ion-item *ngFor="let station of nearbyStations" lines="none">
-          <ion-icon name="train" slot="start" color="primary"></ion-icon>
+        <ion-item *ngFor="let station of nearbyStations.slice(0, 10)">
           <ion-label>
-            <h3>{{ station.name }}駅</h3>
-            <p>{{ station.name_kana }}</p>
-            <p *ngIf="calculateDistance(station)" color="medium">
-              距離: {{ calculateDistance(station) }}m
-            </p>
+            <h3>{{ station.name }}</h3>
+            <p>{{ station.line }}</p>
+            <p *ngIf="calculateDistance(station)">{{ calculateDistance(station) }}m</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Today's Visits -->
+  <ion-card *ngIf="todayVisits.length > 0">
+    <ion-card-header>
+      <ion-card-title>今日の訪問駅 ({{ todayVisits.length }}件)</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let visit of todayVisits">
+          <ion-label>
+            <h3>{{ visit.station_name || 'Unknown Station' }}</h3>
+            <p>到着: {{ visit.arrived_at | date:'HH:mm:ss' }}</p>
+            <p *ngIf="visit.departed_at">出発: {{ visit.departed_at | date:'HH:mm:ss' }}</p>
           </ion-label>
         </ion-item>
       </ion-list>
@@ -120,16 +171,15 @@
   </ion-card>
 
   <!-- Empty State -->
-  <ion-card *ngIf="!isTracking && recentEvents.length === 0">
-    <ion-card-content class="empty-state">
+  <ion-card *ngIf="!trackingStatus.isActive && !isInitializing">
+    <ion-card-content style="text-align: center; padding: 40px;">
       <ion-icon name="location-outline" size="large" color="medium"></ion-icon>
-      <h2>位置追跡を開始してください</h2>
-      <p>駅への到着・出発を自動で記録します</p>
-      <ion-button (click)="toggleTracking()" color="primary">
+      <h2>バックグラウンド位置追跡</h2>
+      <p>アプリがバックグラウンドでも駅への到着・出発を自動記録します</p>
+      <ion-button (click)="toggleTracking()" color="primary" size="large">
         <ion-icon name="play" slot="start"></ion-icon>
         追跡開始
       </ion-button>
     </ion-card-content>
   </ion-card>
-
 </ion-content>

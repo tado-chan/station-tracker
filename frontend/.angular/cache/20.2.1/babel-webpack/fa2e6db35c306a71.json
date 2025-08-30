@@ -1,0 +1,1 @@
+{"ast":null,"code":"/*!\n * (C) Ionic http://ionicframework.com - MIT License\n */\nimport { P as Picker, d as defineCustomElement$1 } from './picker.js';\nconst IonPicker = Picker;\nconst defineCustomElement = defineCustomElement$1;\nexport { IonPicker, defineCustomElement };","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}
