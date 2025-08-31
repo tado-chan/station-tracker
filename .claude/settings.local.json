@@ -18,7 +18,9 @@
       "Bash(find:*)",
       "Bash(grep:*)",
       "Bash(ls:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(python3 manage.py shell:*)",
+      "Bash(python3:*)"
     ],
     "deny": []
   }
