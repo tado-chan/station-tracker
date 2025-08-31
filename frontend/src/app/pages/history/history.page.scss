@@ -1,0 +1,37 @@
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--ion-color-medium);
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1rem;
+}
+
+.stat-item h2 {
+  margin: 0.5rem 0;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.stat-item p {
+  margin: 0;
+  color: var(--ion-color-medium);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.filters {
+  padding: 1rem;
+}
+
+.visit-item {
+  margin: 0.5rem 0;
+}

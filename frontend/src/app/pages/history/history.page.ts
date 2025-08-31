@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
 import { StationService } from '../../services/station.service';
 import { StationVisit, VisitStats } from '../../models/station.model';
 
@@ -6,12 +9,15 @@ import { StationVisit, VisitStats } from '../../models/station.model';
   selector: 'app-history',
   templateUrl: './history.page.html',
   styleUrls: ['./history.page.scss'],
+  standalone: true,
+  imports: [CommonModule, FormsModule, IonicModule]
 })
 export class HistoryPage implements OnInit {
   visits: StationVisit[] = [];
   stats: VisitStats | null = null;
   filteredVisits: StationVisit[] = [];
   loading = false;
+  Math = Math;
   
   // Filter options
   selectedPeriod = 'all';
@@ -122,7 +128,7 @@ export class HistoryPage implements OnInit {
     return { startDate, endDate };
   }
 
-  private filterVisits() {
+  filterVisits() {
     this.filteredVisits = this.visits.filter(visit => {
       const matchesSearch = !this.searchQuery || 
         visit.station_data?.name.toLowerCase().includes(this.searchQuery) ||
