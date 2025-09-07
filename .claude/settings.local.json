@@ -20,7 +20,9 @@
       "Bash(ls:*)",
       "Bash(cp:*)",
       "Bash(python3 manage.py shell:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(python manage.py shell:*)",
+      "Bash(sqlite3:*)"
     ],
     "deny": []
   }
