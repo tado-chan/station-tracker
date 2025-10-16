@@ -22,7 +22,19 @@
       "Bash(python3 manage.py shell:*)",
       "Bash(python3:*)",
       "Bash(python manage.py shell:*)",
-      "Bash(sqlite3:*)"
+      "Bash(sqlite3:*)",
+      "Bash(sudo xcodebuild:*)",
+      "Bash(xcodebuild:*)",
+      "Bash(gem install:*)",
+      "Bash(brew install:*)",
+      "Bash(npm --version)",
+      "Bash(./node_modules/.bin/cap sync:*)",
+      "Bash(npm cache clean:*)",
+      "Bash(pod install:*)",
+      "Bash(sudo gem install:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(chmod:*)",
+      "Bash(cdk init:*)"
     ],
     "deny": []
   }

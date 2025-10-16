@@ -1,0 +1,1 @@
+{"ast":null,"code":"/*!\n * (C) Ionic http://ionicframework.com - MIT License\n */\nimport { R as Radio, d as defineCustomElement$1 } from './radio.js';\nconst IonRadio = Radio;\nconst defineCustomElement = defineCustomElement$1;\nexport { IonRadio, defineCustomElement };","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

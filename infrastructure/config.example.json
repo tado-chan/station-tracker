@@ -1,0 +1,18 @@
+{
+  "aws": {
+    "account": "YOUR_AWS_ACCOUNT_ID",
+    "region": "ap-northeast-1"
+  },
+  "stage": "dev",
+  "locationService": {
+    "mapName": "StationTrackerMap",
+    "placeIndexName": "StationTrackerPlaceIndex",
+    "geofenceCollectionName": "StationTrackerGeofences"
+  },
+  "api": {
+    "throttle": {
+      "rateLimit": 100,
+      "burstLimit": 50
+    }
+  }
+}

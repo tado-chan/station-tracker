@@ -1,0 +1,1 @@
+{"ast":null,"code":"/*!\n * (C) Ionic http://ionicframework.com - MIT License\n */\nimport { B as Button, d as defineCustomElement$1 } from './button.js';\nconst IonButton = Button;\nconst defineCustomElement = defineCustomElement$1;\nexport { IonButton, defineCustomElement };","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

@@ -8,13 +8,13 @@ const config: CapacitorConfig = {
     androidScheme: 'https'
   },
   plugins: {
-    Geolocation: {
-      permissions: ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
-      backgroundLocationIndicator: true,
-      foregroundService: {
-        body: "駅への到着・出発を記録中です",
-        notification: "位置情報を使用中"
-      }
+    BackgroundGeolocation: {
+      notificationTitle: "駅記録アプリ",
+      notificationText: "バックグラウンドで位置を追跡中",
+      notificationChannelName: "Background Location",
+      requestPermissions: true,
+      stale: false,
+      distanceFilter: 10
     },
     LocalNotifications: {
       smallIcon: "ic_stat_icon_config_sample",
@@ -23,13 +23,6 @@ const config: CapacitorConfig = {
     },
     PushNotifications: {
       presentationOptions: ["badge", "sound", "alert"],
-    },
-    BackgroundMode: {
-      enabled: true,
-      title: "駅記録アプリ",
-      text: "バックグラウンドで位置を追跡中...",
-      silent: false,
-      resume: true
     }
   }
 };
