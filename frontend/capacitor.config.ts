@@ -8,14 +8,6 @@ const config: CapacitorConfig = {
     androidScheme: 'https'
   },
   plugins: {
-    BackgroundGeolocation: {
-      notificationTitle: "駅記録アプリ",
-      notificationText: "バックグラウンドで位置を追跡中",
-      notificationChannelName: "Background Location",
-      requestPermissions: true,
-      stale: false,
-      distanceFilter: 10
-    },
     LocalNotifications: {
       smallIcon: "ic_stat_icon_config_sample",
       iconColor: "#488AFF",

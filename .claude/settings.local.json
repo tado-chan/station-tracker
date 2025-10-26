@@ -34,7 +34,9 @@
       "Bash(sudo gem install:*)",
       "Bash(npm uninstall:*)",
       "Bash(chmod:*)",
-      "Bash(cdk init:*)"
+      "Bash(cdk init:*)",
+      "Bash(test:*)",
+      "Bash(tree:*)"
     ],
     "deny": []
   }

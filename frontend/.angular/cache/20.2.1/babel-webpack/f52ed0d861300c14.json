@@ -1,0 +1,1 @@
+{"ast":null,"code":"export const environment = {\n  production: false,\n  api: {\n    baseUrl: 'https://YOUR_API_URL',\n    // TODO: Replace with actual API Gateway URL\n    apiKey: 'YOUR_API_KEY',\n    // TODO: Replace with actual API Key\n    endpoints: {\n      location: '/dev/location'\n    }\n  }\n};","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

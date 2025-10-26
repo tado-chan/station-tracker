@@ -1,0 +1,39 @@
+{
+  "name": "station-tracker-geolocation",
+  "version": "1.0.0",
+  "description": "Native geolocation plugin for Station Tracker with offline queue and reliability",
+  "main": "dist/plugin.cjs.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
+  "unpkg": "dist/plugin.js",
+  "files": [
+    "android/",
+    "dist/",
+    "ios/",
+    "StationTrackerGeolocation.podspec"
+  ],
+  "author": "Station Tracker Team",
+  "license": "MIT",
+  "capacitor": {
+    "ios": {
+      "src": "ios"
+    },
+    "android": {
+      "src": "android"
+    }
+  },
+  "scripts": {
+    "build": "npm run clean && tsc && rollup -c rollup.config.js",
+    "clean": "rimraf ./dist"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.79.1",
+    "typescript": "^5.9.2"
+  },
+  "peerDependencies": {
+    "@capacitor/core": "^7.0.0"
+  }
+}

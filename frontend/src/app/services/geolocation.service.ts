@@ -1,26 +1,38 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BackgroundGeolocationPlugin, Location } from '@capacitor-community/background-geolocation';
-import { registerPlugin } from '@capacitor/core';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Station } from '../models/station.model';
-import { StationService } from './station.service';
 import { environment } from '../../environments/environment';
-
-const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation');
+import { StationTrackerGeolocation } from '../../../station-tracker-geolocation/src';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class GeolocationService {
-  private http = inject(HttpClient);
   private currentLocation = new BehaviorSubject<{latitude: number, longitude: number} | null>(null);
   private isTracking = false;
-  private watcherId: string | null = null;
   private userId: string = 'default_user';  // TODO: Get from authentication service
 
-  constructor(private stationService: StationService) {}
+  constructor() {
+    this.setupListeners();
+  }
+
+  private setupListeners() {
+    StationTrackerGeolocation.addListener('locationUpdate', (location) => {
+      console.log('Location update from native:', location);
+      this.currentLocation.next({
+        latitude: location.latitude,
+        longitude: location.longitude
+      });
+    });
+
+    StationTrackerGeolocation.addListener('visitDetected', (visit) => {
+      console.log('Visit detected from native:', visit);
+    });
+
+    StationTrackerGeolocation.addListener('error', (error) => {
+      console.error('Native plugin error:', error.message);
+    });
+  }
 
   async startBackgroundTracking() {
     if (this.isTracking) {
@@ -29,46 +41,25 @@ export class GeolocationService {
     }
 
     try {
-      // Add location update watcher
-      this.watcherId = await BackgroundGeolocation.addWatcher(
-        {
-          // If backgroundMessage is defined, the watcher will provide location updates whether
-          // the app is in the background or the foreground. If it is not defined, location updates
-          // are only provided when the app is in the foreground. BackgroundGeolocation.addWatcher
-          // must be called when the app is in the foreground.
-          backgroundMessage: "駅への到着・出発を記録しています",
-          backgroundTitle: "駅記録アプリ",
-          requestPermissions: true,
-          stale: false,
-          distanceFilter: 10
-        },
-        (location?: Location, error?: any) => {
-          if (error) {
-            if (error.code === "NOT_AUTHORIZED") {
-              console.error("Location permission not granted");
-            }
-            console.error('Location error:', error);
-            return;
-          }
+      // Configure API settings
+      await StationTrackerGeolocation.configure({
+        apiUrl: environment.api.baseUrl,
+        apiKey: environment.api.apiKey,
+        userId: this.userId,
+        endpoint: environment.api.endpoints.location
+      });
 
-          if (location) {
-            console.log('Location update:', location);
-            this.currentLocation.next({
-              latitude: location.latitude,
-              longitude: location.longitude
-            });
-
-            // Send location to AWS backend
-            this.sendLocationToServer(location.latitude, location.longitude, new Date());
-
-            // Check for nearby stations (legacy - will be replaced by AWS ALS)
-            this.checkNearbyStations(location.latitude, location.longitude);
-          }
-        }
-      );
+      // Start tracking
+      await StationTrackerGeolocation.startTracking({
+        distanceFilter: 10,
+        notificationTitle: "駅記録アプリ",
+        notificationText: "バックグラウンドで位置を追跡中",
+        stationaryRadius: 50,
+        stationaryTime: 300
+      });
 
       this.isTracking = true;
-      console.log('Background tracking started with watcher ID:', this.watcherId);
+      console.log('Background tracking started with native plugin');
     } catch (error) {
       console.error('Failed to start background tracking:', error);
       throw error;
@@ -76,14 +67,13 @@ export class GeolocationService {
   }
 
   async stopBackgroundTracking() {
-    if (!this.isTracking || !this.watcherId) {
+    if (!this.isTracking) {
       console.log('Background tracking not active');
       return;
     }
 
     try {
-      await BackgroundGeolocation.removeWatcher({ id: this.watcherId });
-      this.watcherId = null;
+      await StationTrackerGeolocation.stopTracking();
       this.isTracking = false;
       console.log('Background tracking stopped');
     } catch (error) {
@@ -92,19 +82,7 @@ export class GeolocationService {
     }
   }
 
-  private async checkNearbyStations(latitude: number, longitude: number) {
-    try {
-      // Get nearby stations
-      const stations = await this.stationService.getNearbyStations(latitude, longitude).toPromise();
-
-      if (stations && stations.length > 0) {
-        console.log('Nearby stations detected:', stations);
-        // You can trigger station visit recording here
-      }
-    } catch (error) {
-      console.error('Failed to check nearby stations:', error);
-    }
-  }
+  // Removed: checkNearbyStations - now handled by AWS Lambda
 
   getCurrentLocation() {
     return this.currentLocation.asObservable();
@@ -140,7 +118,8 @@ export class GeolocationService {
   }
 
   async openSettings() {
-    await BackgroundGeolocation.openSettings();
+    // Native plugins don't need this method
+    console.log('Open device settings manually for location permissions');
   }
 
   getTrackingStatus(): boolean {
@@ -148,31 +127,18 @@ export class GeolocationService {
   }
 
   /**
-   * Send location data to AWS backend
+   * Get queue size (pending locations)
    */
-  private async sendLocationToServer(latitude: number, longitude: number, timestamp: Date) {
-    try {
-      const headers = new HttpHeaders({
-        'Content-Type': 'application/json',
-        'x-api-key': environment.api.apiKey
-      });
+  async getQueueSize(): Promise<number> {
+    const result = await StationTrackerGeolocation.getQueueSize();
+    return result.size;
+  }
 
-      const body = {
-        user_id: this.userId,
-        lat: latitude,
-        lng: longitude,
-        timestamp: timestamp.toISOString()
-      };
-
-      const url = `${environment.api.baseUrl}${environment.api.endpoints.location}`;
-
-      const response = await this.http.post(url, body, { headers }).toPromise();
-      console.log('Location sent to server:', response);
-
-    } catch (error) {
-      console.error('Failed to send location to server:', error);
-      // Don't throw - we don't want to break the app if the server is down
-    }
+  /**
+   * Force send all pending locations
+   */
+  async forceSendQueue() {
+    await StationTrackerGeolocation.forceSendQueue();
   }
 
   /**
